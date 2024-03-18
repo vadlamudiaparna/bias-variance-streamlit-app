@@ -20,12 +20,15 @@ requirements.txt: Lists the required Python libraries.
 Scenario 1: Low Bias, Low Variance
 Description: Represents an ideal model with high accuracy and low generalization error.
 Simulation Behavior: Darts cluster tightly around the center of the target.
+
 Scenario 2: High Bias, Low Variance
 Description: Represents a model that might underfit the data, leading to consistently inaccurate predictions.
 Simulation Behavior: Darts cluster tightly but off-center.
+
 Scenario 3: Low Bias, High Variance
 Description: Represents a model that might be capturing too much noise from the data, leading to inconsistent predictions.
 Simulation Behavior: Darts spread widely across the target.
+
 Scenario 4: High Bias, High Variance
 Description: Represents a model that is likely performing poorly due to both inaccurate and inconsistent predictions.
 Simulation Behavior: Darts spread widely and off-center.
