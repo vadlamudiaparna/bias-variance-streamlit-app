@@ -1,58 +1,59 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
-import time
+import matplotlib.patches as patches
 
 # --- Dart Throw Generation ---
+# --- Dart Throw Generation ---
 def generate_throws(dart_set, num_throws):
-    center = (0, 0) 
     if dart_set == 'A - High Bias/High Variance':
-        radius = 3  # Large spread
-        offset = (np.random.rand() - 0.5, np.random.rand() - 0.5)  # Random offset
+        # High Bias/High Variance: Random throws with bias towards outer circles
+        radius = np.random.uniform(1.1, 1.8, num_throws)  # Random radius between 1.3 and 2
+        angle = np.random.uniform(0, 2*np.pi, num_throws)  # Random angle
+        dart_x = radius * np.cos(angle)
+        dart_y = radius * np.sin(angle)
     elif dart_set == 'B - Low Bias/High Variance':
-        radius = 1  # Smaller spread
-        offset = (0.5, 0)  # Offset to the right
+        # Low Bias/High Variance: Clustered throws with spread
+        center = (0.1, 0.1)  # Adjusted center point closer to the bullseye
+        radius = np.random.uniform(0.5, 1.0, num_throws)  # Adjusted radius range
+        angle = np.random.uniform(0, 2*np.pi, num_throws)  # Random angle
+        dart_x = radius * np.cos(angle) + center[0]
+        dart_y = radius * np.sin(angle) + center[1]
     elif dart_set == 'C - High Bias/Low Variance':
-        radius = 0.5 # Small spread
-        offset = (0.5, 0.5) # Fixed offset
-    else:  # 'D - High Bias/High Variance'
-        radius = 2 
-        offset = (0.5, -0.5) 
+        # High Bias/Low Variance: Clustered throws without spread
+        center = (0.5, 0.5)
+        dart_x = np.random.normal(center[0], 0.1, num_throws)
+        dart_y = np.random.normal(center[1], 0.1, num_throws)
+    else:  # 'D - Low Bias/Low Variance'
+        # Low Bias/Low Variance: Clustered throws around bullseye
+        dart_x = np.random.normal(0, 0.1, num_throws)
+        dart_y = np.random.normal(0, 0.1, num_throws)
+    return dart_x, dart_y
 
-    angles = np.linspace(0, 2*np.pi, num_throws, endpoint=False)
-    x = radius * np.cos(angles) + offset[0] + np.random.randn(num_throws) * 0.4 
-    y = radius * np.sin(angles) + offset[1] + np.random.randn(num_throws) * 0.4
-    return x, y
 
 # --- Dartboard Visualization ---
 def create_dartboard_plot():
     fig, ax = plt.subplots()
-    for radius in [1, 2, 3]:
-        circle = plt.Circle((0, 0), radius, color='lightgray')
-        ax.add_patch(circle)
     ax.set_aspect('equal')
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
-    ax.set_xlim([-4, 4])
-    ax.set_ylim([-4, 4])
-    ax.set_title('Dartboard')
-    return fig, ax
+    ax.set_xlim([-3, 3])  # Fixing x-axis limit
+    ax.set_ylim([-3, 3])  # Fixing y-axis limit
     
-def update_plot(dart_x, dart_y):
-    dartboard_fig, dartboard_ax = create_dartboard_plot() 
-    dartboard_ax.scatter(dart_x, dart_y, color='red')
-    return dartboard_fig
-
-# --- Error vs. Complexity Graph ---
-def generate_error_complexity_graph():
-    model_complexity = np.arange(1, 11)  
-    error = np.exp(-model_complexity) + np.random.randn(10) * 0.2  
-    fig, ax = plt.subplots()
-    ax.plot(model_complexity, error)
-    ax.set_xlabel('Model Complexity')
-    ax.set_ylabel('Error')
-    ax.set_title('Error vs. Model Complexity')
+    # Draw circles representing dartboard rings
+    circle_colors = ['lightblue', 'skyblue', 'royalblue', 'red']
+    circle_radii = [1.8, 1.3, 0.8, 0.3]  # reversed order
+    for color, radius in zip(circle_colors, circle_radii):
+        circle = patches.Circle((0, 0), radius, color=color, fill=True)
+        ax.add_patch(circle)
+        
+    ax.set_title('Dartboard')
     return fig
+
+def update_plot(dart_x, dart_y):
+    dartboard_fig = create_dartboard_plot() 
+    plt.scatter(dart_x, dart_y, color='yellow', edgecolor='black', alpha=0.8)
+    return dartboard_fig
 
 # --- Streamlit App Structure ---
 st.title("Variance-Bias Tradeoff: Dart Game Simulator")
@@ -71,14 +72,11 @@ dartboard_fig = update_plot(dart_x, dart_y)
 st.pyplot(dartboard_fig)
 
 # Text Explainers - During Simulation
-if dart_set in ['A - High Bias/High Variance', 'C - High Bias/Low Variance']:
-    st.write("This dart set has high bias. Imagine a dart player who consistently aims far from the center. Even though some throws might hit the bullseye by chance, most will miss the target by a large margin. This translates to a model that consistently makes inaccurate predictions.")
-elif dart_set in ['B - Low Bias/High Variance', 'D - Low Bias/Low Variance']:
-    st.write("This dart set has low bias. The throws are generally centered around the bullseye. However, there's still variance (spread) in the throws. Imagine a player who aims well but has shaky hands, leading to some throws landing further away from the center. This translates to a model that makes accurate predictions on average, but the specific predictions can vary for the same input.")
-
-# --- Advanced Discussion ---
-st.header("Finding the Balance & Regularization")
-st.write("In machine learning, models also face a bias-variance tradeoff. Bias refers to the model's tendency to underfit the training data, leading to consistently inaccurate predictions across the board. Variance refers to the model's sensitivity to small fluctuations in the training data, resulting in inconsistent predictions for the same input.")
-st.write("The ideal scenario (sweet spot) is a model with low bias (accurate) and low variance (consistent).")
-st.write("Regularization techniques (like L1/L2) can help reduce variance by adding a penalty for model complexity. Imagine a dart player who wears weighted wristbands to reduce shakiness, leading to more consistent throws. Regularization penalizes overly complex models, making them less sensitive to specific features in the training data and promoting better generalization.")
-st.pyplot(generate_error_complexity_graph())
+if dart_set == 'A - High Bias/High Variance':
+    st.write("This dart set represents high bias and high variance. The dart throws are widely scattered and consistently far from the bullseye. In machine learning, this scenario signifies a model that is uncertain and inaccurate on average.")
+elif dart_set == 'B - Low Bias/High Variance':
+    st.write("This dart set represents low bias and high variance. The dart throws are clustered around a specific area but are spread out. In machine learning, this scenario signifies a model that is consistent but inaccurate.")
+elif dart_set == 'C - High Bias/Low Variance':
+    st.write("This dart set represents high bias and low variance. The dart throws are tightly clustered but consistently miss the bullseye. In machine learning, this scenario signifies a model that is uncertain but accurate.")
+else:  # 'D - Low Bias/Low Variance'
+    st.write("This dart set represents low bias and low variance. The dart throws are tightly clustered around the bullseye. In machine learning, this scenario signifies a model that is consistent and accurate (IDEAL).")
