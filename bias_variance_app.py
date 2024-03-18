@@ -41,7 +41,7 @@ def create_dartboard_plot():
     ax.set_ylim([-3, 3])  # Fixing y-axis limit
     
     # Draw circles representing dartboard rings
-    circle_colors = ['lightblue', 'skyblue', 'royalblue', 'red']
+    circle_colors = ['lightblue', 'skyblue', 'royalblue', 'purple']
     circle_radii = [1.8, 1.3, 0.8, 0.3]  # reversed order
     for color, radius in zip(circle_colors, circle_radii):
         circle = patches.Circle((0, 0), radius, color=color, fill=True)
