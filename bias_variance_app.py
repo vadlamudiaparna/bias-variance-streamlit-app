@@ -71,12 +71,13 @@ dart_x, dart_y = generate_throws(dart_set, num_throws)
 dartboard_fig = update_plot(dart_x, dart_y)
 st.pyplot(dartboard_fig)
 
-# Text Explainers - During Simulation
+# Scenario-Specific Explanations
+st.header("Scenario Analysis") 
 if dart_set == 'A - High Bias/High Variance':
-    st.write("This dart set represents high bias and high variance. The dart throws are widely scattered and consistently far from the bullseye. In machine learning, this scenario signifies a model that is uncertain and inaccurate on average.")
+    st.write("**Scenario Analysis:** This represents a **severely underfit** model with **high bias** (consistently inaccurate) and **high variance** (inconsistent predictions). Think of a dart player who throws wildly, rarely hitting the target.")
 elif dart_set == 'B - Low Bias/High Variance':
-    st.write("This dart set represents low bias and high variance. The dart throws are clustered around a specific area but are spread out. In machine learning, this scenario signifies a model that is consistent but inaccurate.")
+    st.write("**Scenario Analysis:** This represents a **potentially overfit** model with **low bias** (generally accurate) but **high variance** (inconsistent predictions). Think of a player who aims well but has unsteady hands, leading to scattered throws around the target.")
 elif dart_set == 'C - High Bias/Low Variance':
-    st.write("This dart set represents high bias and low variance. The dart throws are tightly clustered but consistently miss the bullseye. In machine learning, this scenario signifies a model that is uncertain but accurate.")
+    st.write("**Scenario Analysis:** This represents an **underfit** model with **high bias** (consistently inaccurate) and **low variance** (consistently but wrongly predicted results). Think of a player who consistently aims at the wrong spot with precision.")
 else:  # 'D - Low Bias/Low Variance'
-    st.write("This dart set represents low bias and low variance. The dart throws are tightly clustered around the bullseye. In machine learning, this scenario signifies a model that is consistent and accurate (IDEAL).")
+    st.write("**Scenario Analysis:**  This represents the **ideal** model with **low bias** (consistently accurate) and **low variance** (consistent and reliable predictions). Think of a highly skilled player who consistently hits the bullseye.")
